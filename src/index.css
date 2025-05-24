@@ -249,8 +249,6 @@ body {
   align-items: center;
   gap: var(--spacing-xs);
 }
-
-/* Details section */
 .details {
   line-height: 1.4;
   font-size: 1.4rem;
@@ -259,19 +257,16 @@ body {
 .details header {
   display: flex;
 }
-
 .details section {
   padding: var(--spacing-xl);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
 }
-
 .details img {
   width: 33%;
   border-radius: var(--border-radius) 0 0 0;
 }
-
 .details-overview {
   width: 100%;
   padding: var(--spacing-md) 3rem;
@@ -280,20 +275,16 @@ body {
   flex-direction: column;
   gap: 1.4rem;
 }
-
 .details-overview h2 {
   font-size: 2.4rem;
   margin-bottom: 0.4rem;
   line-height: 1.1;
 }
-
 .details-overview p {
   display: flex;
   align-items: center;
   gap: var(--spacing-xs);
 }
-
-/* Rating */
 .rating {
   background-color: var(--color-background-100);
   border-radius: var(--border-radius);
@@ -305,7 +296,6 @@ body {
   gap: var(--spacing-md);
 }
 
-/* Add button */
 .btn-add {
   background-color: var(--color-primary);
   color: var(--color-text);
@@ -327,8 +317,6 @@ body {
 .btn-add:active {
   transform: translateY(0);
 }
-
-/* Seconds indicator */
 .seconds {
   background-color: var(--color-background-100);
   width: 8rem;
@@ -338,8 +326,6 @@ body {
   padding: 0.4rem;
   margin-top: var(--spacing-md);
 }
-
-/* Back button */
 .btn-back {
   position: absolute;
   top: 0.6rem;
@@ -361,12 +347,9 @@ body {
   justify-content: center;
   transition: var(--transition);
 }
-
 .btn-back:hover {
   transform: scale(1.1);
 }
-
-/* Status messages */
 .loader {
   text-align: center;
   text-transform: uppercase;
@@ -381,8 +364,6 @@ body {
   padding: var(--spacing-xl);
   color: var(--color-red);
 }
-
-/* Media queries for responsiveness */
 @media screen and (max-width: 900px) {
   .main {
     flex-direction: column;
@@ -418,4 +399,25 @@ body {
   .search {
     width: 100%;
   }
+}
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  min-height: 20rem;
+}
+.loading {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-primary);
+  background-color: var(--color-background-100);
+  padding: var(--spacing-md);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-sm);
+  letter-spacing: 0.05em;
+  width: auto;
+  display: inline-block;
 }

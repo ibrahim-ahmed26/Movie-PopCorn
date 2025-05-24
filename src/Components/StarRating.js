@@ -1,7 +1,21 @@
 import { useState } from "react";
-
-export default function StarRating({ maxRating = 5 }) {
-  const [rating, setRating] = useState(0);
+import PropTypes from "prop-types";
+StarRating.propTypes = {
+  maxRating: PropTypes.number.isRequired,
+  color: PropTypes.string,
+  messages: PropTypes.array,
+  onSetRating: PropTypes.func,
+  defaultRating: PropTypes.number,
+};
+export default function StarRating({
+  maxRating = 5,
+  color = "#fcc419",
+  size = 48,
+  messages = [],
+  onSetRating,
+  defaultRating = 0,
+}) {
+  const [rating, setRating] = useState(defaultRating);
   const [hoverRating, setHoverRating] = useState(0);
 
   const containerStyle = {
@@ -20,11 +34,15 @@ export default function StarRating({ maxRating = 5 }) {
   };
 
   const ratingTextStyle = {
-    fontSize: "18px",
+    fontSize: `${size / 1.5}px`,
     marginLeft: "8px",
     margin: "0",
+    color: color,
   };
-
+  function handleRating(rating) {
+    setRating(rating);
+    onSetRating(rating);
+  }
   return (
     <div style={containerStyle}>
       <div style={starsContainerStyle}>
@@ -32,31 +50,39 @@ export default function StarRating({ maxRating = 5 }) {
           <span
             key={i}
             style={starSpanStyle}
-            onClick={() => setRating(i + 1)}
+            onClick={() => handleRating(i + 1)}
             onMouseEnter={() => setHoverRating(i + 1)}
             onMouseLeave={() => setHoverRating(0)}
           >
-            <Star filled={hoverRating ? i < hoverRating : i < rating} />
+            <Star
+              filled={hoverRating ? i < hoverRating : i < rating}
+              color={color}
+              size={size}
+            />
           </span>
         ))}
       </div>
-      <p style={ratingTextStyle}>{hoverRating || rating || ""}</p>
+      <p style={ratingTextStyle}>
+        {messages.length === maxRating
+          ? messages[hoverRating ? hoverRating - 1 : rating - 1]
+          : hoverRating || rating || ""}
+      </p>
     </div>
   );
 }
 
-function Star({ filled }) {
+function Star({ filled, color, size }) {
   const starStyle = {
-    width: "32px",
-    height: "32px",
+    width: `${size}px`,
+    height: `${size}px`,
   };
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      fill={filled ? "#000" : "none"}
+      fill={filled ? color : "none"}
       viewBox="0 0 24 24"
-      stroke="currentColor"
+      stroke={color}
       style={starStyle}
     >
       <path
