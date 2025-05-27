@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import StarRating from "./StarRating";
 
 const tempMovieData = [
   {
@@ -55,6 +56,13 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [watched, setWatched] = useState([]);
   const [error, setError] = useState("");
+  const [selectedId, setSelectedId] = useState("");
+  function handleSelection(id) {
+    setSelectedId((selectedId) => (selectedId === id ? null : id));
+  }
+  function deleteSelection() {
+    setSelectedId(null);
+  }
   useEffect(() => {
     async function fetchMovies() {
       try {
@@ -73,7 +81,6 @@ export default function App() {
         setMovies(data.Search);
       } catch (err) {
         setError(err.message);
-        console.log(err.message);
       } finally {
         setIsLoading(false);
       }
@@ -95,12 +102,23 @@ export default function App() {
         <Box>
           {/* {isLoading ? <Loading /> : <ListedMovies movies={movies} />} */}
           {isLoading && <Loading />}
-          {!isLoading && !error && <ListedMovies movies={movies} />}
+          {!isLoading && !error && (
+            <ListedMovies movies={movies} onSelectMovie={handleSelection} />
+          )}
           {error && <ErrorMessage message={error} />}
         </Box>
         <Box>
-          <MovieSummary watched={watched} />
-          <SelectedMovieList watched={watched} />
+          {selectedId ? (
+            <MovieSelection
+              selectedId={selectedId}
+              onRemoveMovie={deleteSelection}
+            />
+          ) : (
+            <>
+              <MovieSummary watched={watched} />
+              <SelectedMovieList watched={watched} />
+            </>
+          )}
         </Box>
       </Main>
     </>
@@ -176,21 +194,25 @@ function ToggleButton({ isOpen, onToggle }) {
   );
 }
 
-function ListedMovies({ movies }) {
+function ListedMovies({ movies, onSelectMovie }) {
   return (
     <>
-      <ul className="list">
+      <ul className="list list-movies">
         {movies?.map((movie) => (
-          <MovieDetails movie={movie} key={movie.imdbID} />
+          <MovieDetails
+            movie={movie}
+            key={movie.imdbID}
+            onSelectMovie={onSelectMovie}
+          />
         ))}
       </ul>
     </>
   );
 }
 
-function MovieDetails({ movie }) {
+function MovieDetails({ movie, onSelectMovie }) {
   return (
-    <li key={movie.imdbID}>
+    <li key={movie.imdbID} onClick={() => onSelectMovie(movie.imdbID)}>
       <MovieHeader movie={movie} />
       <MovieYear movie={movie} />
     </li>
@@ -225,6 +247,87 @@ function MovieSummary({ watched }) {
 function MovieSummaryHeader() {
   return <h2>Movies you watched</h2>;
 }
+function MovieSelection({ selectedId, onRemoveMovie }) {
+  const [movie, setMovie] = useState({});
+  const [loading, setIsLoading] = useState(false);
+  const {
+    Title: title,
+    Actors: actors,
+    Poster: poster,
+    Genre: genre,
+    Plot: plot,
+    Released: released,
+    Year: year,
+    imdbRating,
+    Writer: writer,
+  } = movie;
+
+  useEffect(() => {
+    try {
+      async function fetchMovie() {
+        setIsLoading(true);
+        const res = await fetch(
+          `https://www.omdbapi.com/?apikey=${apiKey}&i=${selectedId}`
+        );
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error("Falied To Fetch");
+        }
+        setMovie(data);
+      }
+      fetchMovie();
+    } catch (err) {
+      console.log(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [selectedId]);
+  return (
+    <div className="box movie-selection">
+      {loading ? (
+        <Loading />
+      ) : (
+        <>
+          <button className="btn-back" onClick={onRemoveMovie}>
+            🔙 Back
+          </button>
+          <div className="selection-body">
+            <img
+              className="selection-poster"
+              src={poster}
+              alt={`${title} poster`}
+            />
+            <div className="selection-details">
+              <h2 className="selection-title">
+                {title} ({year})
+              </h2>
+              <p>
+                <strong>🎭 Genre:</strong> {genre}
+              </p>
+              <p>
+                <strong>🗓 Released:</strong> {released}
+              </p>
+              <p>
+                <strong>⭐ IMDb Rating:</strong> {imdbRating}
+              </p>
+              <p>{<StarRating maxRating={10} size={24} />}</p>
+              <p>
+                <strong>👨‍🎤 Actors:</strong> {actors}
+              </p>
+              <p>
+                <strong>✍ Writer:</strong> {writer}
+              </p>
+              <p>
+                <strong>📝 Plot:</strong> {plot}
+              </p>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function MovieSummaryList({ watched }) {
   const avgImdbRating = average(watched.map((movie) => movie.imdbRating));
   const avgUserRating = average(watched.map((movie) => movie.userRating));
