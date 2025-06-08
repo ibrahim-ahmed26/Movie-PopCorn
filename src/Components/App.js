@@ -17,7 +17,10 @@ export default function App() {
   const [movies, setMovies] = useState([]);
   const [query, setQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(() => {
+    const storedValue = localStorage.getItem("Watched");
+    return storedValue ? JSON.parse(storedValue) : [];
+  });
   const [error, setError] = useState("");
   const [selectedId, setSelectedId] = useState("");
   function handleSelection(id) {
@@ -32,6 +35,9 @@ export default function App() {
   function handleDeleteMovie(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id));
   }
+  useEffect(() => {
+    localStorage.setItem("Watched", JSON.stringify(watched));
+  }, [watched]);
   useEffect(() => {
     const controller = new AbortController();
     async function fetchMovies() {
