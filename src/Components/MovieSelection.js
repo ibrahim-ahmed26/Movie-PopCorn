@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { apiKey } from "./App";
 import { Loading } from "./Loading";
 import StarRating from "./StarRating";
+import { useKey } from "./CustomHooks/useKey";
 
 export function MovieSelection({
   selectedId,
@@ -28,6 +29,12 @@ export function MovieSelection({
     Writer: writer,
     Runtime: runtime,
   } = movie;
+  const counterRating = useRef(0);
+  useEffect(() => {
+    if (userRating) {
+      counterRating.current++;
+    }
+  }, [userRating]);
   function handleAdd() {
     const alreadyAdded = watched.some((movie) => movie.imdbID === selectedId);
     if (alreadyAdded) {
@@ -42,6 +49,7 @@ export function MovieSelection({
       Poster,
       runtime: Number(runtime.split(" ").at(0)),
       userRating,
+      counterRatingDecision: counterRating.current,
     };
     onAddMovieToList(newWatchedMovie);
     onRemoveMovie();
@@ -76,17 +84,7 @@ export function MovieSelection({
     },
     [title]
   );
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === "Escape") {
-        onRemoveMovie();
-      }
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return function () {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onRemoveMovie]);
+  useKey("Escape", onRemoveMovie);
   return (
     <div className="box movie-selection">
       {loading ? (
